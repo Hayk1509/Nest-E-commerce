@@ -6,6 +6,7 @@ import {
   Request,
   Get,
   Body,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -30,9 +31,17 @@ export class AuthController {
     return this.authService.login(req);
   }
 
+  @Post('refresh')
+  async refresh(@Body('refresh_token') refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not provided');
+    }
+    return this.authService.refreshToken(refreshToken);
+  }
+
   @Get('google')
   @UseGuards(GoogleAuthGuard)
-  async googleAuth(@Request() req) {
+  async googleAuth() {
     // This route initiates the Google OAuth flow
   }
 
