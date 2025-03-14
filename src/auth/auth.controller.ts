@@ -12,26 +12,24 @@ import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { GetUserDto } from 'src/users/dto/get-user.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // Registration endpoint
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     return await this.authService.register(createUserDto);
   }
 
-  // Local login endpoint
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.user);
+  async login(@Body() req: GetUserDto) {
+    return this.authService.login(req);
   }
 
-  // Initiate Google OAuth login
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   async googleAuth(@Request() req) {

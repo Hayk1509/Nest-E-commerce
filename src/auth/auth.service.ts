@@ -14,7 +14,6 @@ export class AuthService {
   // Validate user credentials for local auth
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    // NOTE: In production, compare hashed passwords!
     if (user && user.password === pass) {
       const { password, ...result } = user;
       return result;
@@ -22,7 +21,6 @@ export class AuthService {
     return null;
   }
 
-  // Issue a JWT token
   async login(user: any) {
     const payload = { email: user.email, sub: user.id };
     return {
@@ -30,7 +28,6 @@ export class AuthService {
     };
   }
 
-  // Handle registration
   async register(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
     return this.login(user);
