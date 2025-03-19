@@ -20,11 +20,12 @@ model User {
   firstName String?
   lastName  String?
   role      Role    @default(USER)
-  // For Google Auth, you might store an optional googleId:
   googleId  String? @unique
 
-  // Relationship: A seller has many products.
+  // Relationships
   products Product[]
+  articles Article[] // A user can author many articles.
+  comments Comment[] // A user can write many comments.
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -33,12 +34,10 @@ model User {
 model Category {
   id       Int        @id @default(autoincrement())
   name     String     @unique
-  // If using nested categories:
   parentId Int?
   parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
   children Category[] @relation("CategoryToCategory")
 
-  // Relationship: A category has many products.
   products Product[]
 
   createdAt DateTime @default(now())
@@ -50,15 +49,45 @@ model Product {
   name        String
   description String?
   price       Float
-  // Optionally add stock, SKU, etc.
 
-  // Foreign Key to Category:
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
-  // Optional: If the product is linked to a seller:
   sellerId Int?
   seller   User? @relation(fields: [sellerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Article {
+  id        Int     @id @default(autoincrement())
+  title     String
+  content   String
+  published Boolean @default(false)
+
+  // Relationship to the author
+  authorId Int?
+  author   User? @relation(fields: [authorId], references: [id])
+
+  // An article can have many comments.
+  comments Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id      Int    @id @default(autoincrement())
+  content String
+
+  // Each comment belongs to an article.
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [id])
+
+  // Optionally, a comment is authored by a user.
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

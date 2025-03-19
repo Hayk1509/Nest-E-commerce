@@ -15,10 +15,10 @@ async function bootstrap() {
 
   // Swagger configuration
   const config = new DocumentBuilder()
-    .setTitle('My Project API')
+    .setTitle('E-commerce Project API')
     .setDescription('API documentation for my NestJS project')
     .setVersion('1.0')
-    .addTag('api')
+    .addTag('CRUD api`s')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
