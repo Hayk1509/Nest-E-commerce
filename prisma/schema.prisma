@@ -9,7 +9,7 @@ generator client {
 
 enum Role {
   ADMIN
-  SALER
+  MANAGER
   USER
 }
 

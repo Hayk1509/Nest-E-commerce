@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateCategoryDto {
   @ApiProperty({ example: 'Category 1' })
@@ -7,7 +8,9 @@ export class CreateCategoryDto {
   @IsString()
   name: string;
 
-  @ApiPropertyOptional({example: 'Id of parent catgory'})
+  @ApiPropertyOptional({ example: 'Id of parent catgory' })
   @IsNumber()
-  parentId: number;
+  @IsOptional()
+  @Type(() => Number)
+  parentId?: number;
 }

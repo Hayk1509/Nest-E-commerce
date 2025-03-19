@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class GetUserDto {
-  @ApiProperty({ example: 'MyEmail@ggmail.com' })
+  @ApiProperty({ example: 'user@example1.com' })
   @IsEmail()
   email: string;
 

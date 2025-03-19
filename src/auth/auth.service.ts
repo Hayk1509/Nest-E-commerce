@@ -1,9 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { GetUserDto } from 'src/users/dto/get-user.dto';
 @Injectable()
 export class AuthService {
@@ -35,7 +39,16 @@ export class AuthService {
     const user = await this.usersService.create(createUserDto);
     return this.login(user);
   }
-
+  async registerAdmin(createUserDto: CreateUserDto) {
+    const existingAdmin = await this.usersService.findOneByRole('ADMIN');
+    if (existingAdmin) {
+      throw new ConflictException('Ադմին գրանցված է արդեն');
+    }
+    return await this.usersService.create({ ...createUserDto, role: 'ADMIN' });
+  }
+  async setUserRole(userId: number, role: Role) {
+    return await this.usersService.updateRole(userId, role);
+  }
   async googleLogin(req: { user: User }) {
     if (!req.user) {
       throw new UnauthorizedException();

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/creaete-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -12,11 +16,31 @@ import {
 export class CategoriesService {
   constructor(private prismaService: PrismaService) {}
   async create(category: CreateCategoryDto) {
-    return await this.prismaService.category.create({
-      data: {
-        name: category.name,
-      },
-    });
+    try {
+      // Ստուգում, թե կատեգորիան արդեն գոյություն ունի
+      const existingCategory = await this.prismaService.category.findUnique({
+        where: { name: category.name },
+      });
+
+      if (existingCategory) {
+        throw new ConflictException(
+          `Կատեգորիա ${category.name} արդեն գոյություն ունի`,
+        );
+      }
+
+      return await this.prismaService.category.create({
+        data: category,
+      });
+    } catch (error) {
+      // Եթե ստացվում է այլ ներքին սխալ
+      if (error.code === 'P2002') {
+        // Հավանաբար հնարավոր է, որ կրկնակի գներ դեռևս չհաստատված են նախորդ ստուգումից
+        throw new ConflictException(
+          `Կատեգորիա ${category.name} արդեն գոյություն ունի`,
+        );
+      }
+      throw new InternalServerErrorException('Ներքին խնդիր է առաջացել');
+    }
   }
   async getAll(filterDto?: GetCategoriesFilterDto) {
     const { name, parentId, sortBy, sortOrder } = filterDto || {};

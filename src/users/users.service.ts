@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
 import * as bcrypt from 'bcrypt';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +16,7 @@ export class UsersService {
         firstName: userData.firstName,
         lastName: userData.lastName,
         password: hashedPassword,
+        role: userData.role || 'USER',
       },
     });
     return user;
@@ -33,6 +35,19 @@ export class UsersService {
     });
     return user;
   }
+  async findOneByRole(role: Role) {
+    return await this.prismaService.user.findFirst({
+      where: { role },
+    });
+  }
+
+  async updateRole(userId: number, role: Role) {
+    return await this.prismaService.user.update({
+      where: { id: userId },
+      data: { role },
+    });
+  }
+
   async findByEmail(email: string) {
     return await this.prismaService.user.findUnique({
       where: { email },

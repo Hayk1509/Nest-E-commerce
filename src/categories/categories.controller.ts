@@ -7,6 +7,9 @@ import {
   Post,
   Put,
   Query,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -17,13 +20,21 @@ import {
   SortOrder,
 } from './dto/get-categories-filter.dto';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { Roles, RolesGuard } from 'src/common/guards/roles.guard';
 
 @Controller('categories')
+// @UseFilters(HttpExceptionFilter)
+@UseInterceptors(LoggingInterceptor)
+// @UseGuards(RolesGuard)
 export class CategoriesController {
   constructor(private categoryService: CategoriesService) {}
 
   @Post()
+  // @Roles('ADMIN')
   async createCategory(@Body() req: CreateCategoryDto) {
+    console.log('mtnumes stex?')
     return this.categoryService.create(req);
   }
 
